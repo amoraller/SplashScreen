@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="SplashScreen/SplashScreen.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+    <File Path="LICENSE" />
+    <File Path="NOTICE" />
+  </Folder>
+</Solution>
