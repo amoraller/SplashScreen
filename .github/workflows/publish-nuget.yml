@@ -45,13 +45,36 @@ jobs:
             throw "Invalid package version: $version"
           }
 
+          Write-Host "Resolved package version: $version"
           "value=$version" >> $env:GITHUB_OUTPUT
 
       - name: Pack NuGet package
+        id: pack
         shell: pwsh
         env:
           PACKAGE_VERSION: ${{ steps.version.outputs.value }}
-        run: dotnet pack SplashScreen\SplashScreen.csproj --configuration Release --output artifacts -p:PackageVersion=$env:PACKAGE_VERSION
+        run: |
+          dotnet pack SplashScreen\SplashScreen.csproj --configuration Release --output artifacts "-p:PackageVersion=$env:PACKAGE_VERSION"
+          if ($LASTEXITCODE -ne 0) {
+            throw "dotnet pack failed with exit code $LASTEXITCODE"
+          }
+
+          $packagePath = "artifacts\Amoraller.Windows.SplashScreen.$env:PACKAGE_VERSION.nupkg"
+          if (-not (Test-Path -LiteralPath $packagePath)) {
+            $foundPackages = Get-ChildItem artifacts -Filter '*.nupkg' -File -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
+            throw "Expected package '$packagePath' was not created. Found: $($foundPackages -join ', ')"
+          }
+
+          Write-Host "Created package: $packagePath"
+          "package_path=$packagePath" >> $env:GITHUB_OUTPUT
+
+      - name: Upload NuGet package artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Amoraller.Windows.SplashScreen-${{ steps.version.outputs.value }}
+          path: ${{ steps.pack.outputs.package_path }}
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Authenticate with NuGet Trusted Publishing
         uses: NuGet/login@v1.2.0
@@ -63,4 +86,5 @@ jobs:
         shell: pwsh
         env:
           NUGET_API_KEY: ${{ steps.nuget.outputs.NUGET_API_KEY }}
-        run: dotnet nuget push artifacts\*.nupkg --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+          PACKAGE_PATH: ${{ steps.pack.outputs.package_path }}
+        run: dotnet nuget push $env:PACKAGE_PATH --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate

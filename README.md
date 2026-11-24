@@ -71,7 +71,7 @@ To enable publishing, add a Trusted Publishing policy on nuget.org for:
 - Environment: leave empty
 - Package scope: `Amoraller.Windows.SplashScreen`, allowing new packages and new versions
 
-For a GitHub Release, use a tag such as `v1.0.0`. For a manual run, provide the package version without the `v` prefix.
+For a GitHub Release, use a tag such as `v1.0.0`. For a manual run, provide the package version without the `v` prefix. Each successful run also uploads its `.nupkg` to the GitHub Actions run artifacts for download.
 
 ## License
 
