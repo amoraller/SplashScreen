@@ -2,6 +2,8 @@
 
 A standalone splash-screen component for WPF applications on Windows. It displays an image resource in a layered Win32 window and preserves per-pixel transparency while fading out.
 
+This project was created to address bugs in the built-in WPF `SplashScreen`, including transparent image regions turning black during fade-out ([dotnet/wpf#11321](https://github.com/dotnet/wpf/issues/11321)).
+
 ## Requirements
 
 - Windows
