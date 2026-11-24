@@ -12,7 +12,13 @@ This project was created to address bugs in the built-in WPF `SplashScreen`, inc
 
 ## Installation
 
-Build the `SplashScreen` project and reference its assembly from your WPF application. The native Win32 declarations are generated at build time with [CsWin32](https://github.com/microsoft/CsWin32).
+Install the package from NuGet:
+
+```powershell
+dotnet add package Amoraller.Windows.SplashScreen
+```
+
+The native Win32 declarations are generated at build time with [CsWin32](https://github.com/microsoft/CsWin32).
 
 ## Usage
 

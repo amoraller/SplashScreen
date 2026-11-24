@@ -6,6 +6,16 @@
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageId>Amoraller.Windows.SplashScreen</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Amoraller</Authors>
+    <Description>A WPF splash screen for Windows that preserves image transparency during fade-out.</Description>
+    <PackageTags>WPF;SplashScreen;Windows;Transparency</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/amoraller/SplashScreen</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/amoraller/SplashScreen.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +28,9 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <AdditionalFiles Include="NativeMethods.txt" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\NOTICE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,64 @@
+name: Publish NuGet package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      package_version:
+        description: Package version (for example 1.0.0)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve package version
+        id: version
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_VERSION: ${{ inputs.package_version }}
+        run: |
+          if ($env:GITHUB_EVENT_NAME -eq 'release') {
+            $version = $env:RELEASE_TAG
+          }
+          else {
+            $version = $env:INPUT_VERSION
+          }
+
+          $version = $version.TrimStart('v', 'V')
+          if ($version -notmatch '^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$') {
+            throw "Invalid package version: $version"
+          }
+
+          "value=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Pack NuGet package
+        shell: pwsh
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.value }}
+        run: dotnet pack SplashScreen\SplashScreen.csproj --configuration Release --output artifacts -p:PackageVersion=$env:PACKAGE_VERSION
+
+      - name: Publish to nuget.org
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
+            throw 'Add the NUGET_API_KEY secret in the GitHub repository settings before publishing.'
+          }
+
+          dotnet nuget push artifacts\*.nupkg --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
