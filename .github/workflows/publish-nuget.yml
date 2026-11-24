@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -52,13 +53,14 @@ jobs:
           PACKAGE_VERSION: ${{ steps.version.outputs.value }}
         run: dotnet pack SplashScreen\SplashScreen.csproj --configuration Release --output artifacts -p:PackageVersion=$env:PACKAGE_VERSION
 
+      - name: Authenticate with NuGet Trusted Publishing
+        uses: NuGet/login@v1
+        id: nuget
+        with:
+          user: amoraller
+
       - name: Publish to nuget.org
         shell: pwsh
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
-            throw 'Add the NUGET_API_KEY secret in the GitHub repository settings before publishing.'
-          }
-
-          dotnet nuget push artifacts\*.nupkg --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+          NUGET_API_KEY: ${{ steps.nuget.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push artifacts\*.nupkg --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate

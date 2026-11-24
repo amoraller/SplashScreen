@@ -59,6 +59,20 @@ The image resource is resolved from the entry assembly by default. An overload a
 var splashScreen = new SplashScreen(typeof(App).Assembly, "Splash.png");
 ```
 
+## Publishing
+
+The GitHub Actions workflow publishes the package when a GitHub Release is published or when the workflow is started manually. It uses NuGet Trusted Publishing (GitHub OIDC), so no long-lived NuGet API key needs to be stored in GitHub secrets.
+
+To enable publishing, add a Trusted Publishing policy on nuget.org for:
+
+- Repository owner: `amoraller`
+- Repository: `SplashScreen`
+- Workflow file: `publish-nuget.yml` (filename only; do not include `.github/workflows/`)
+- Environment: leave empty
+- Package scope: `Amoraller.Windows.SplashScreen`, allowing new packages and new versions
+
+For a GitHub Release, use a tag such as `v1.0.0`. For a manual run, provide the package version without the `v` prefix.
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details. The implementation is adapted from the [WPF SplashScreen](https://github.com/dotnet/wpf/blob/main/src/Microsoft.DotNet.Wpf/src/WindowsBase/System/Windows/SplashScreen.cs), Copyright .NET Foundation, also licensed under MIT.
